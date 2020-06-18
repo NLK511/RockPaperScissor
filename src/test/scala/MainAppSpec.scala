@@ -9,19 +9,22 @@ class MainAppSpec extends FlatSpec {
    * We are fairly sure that each move will be chosen with the same probability,
    * so consider it as a test for demonstration purpose :) .
    * Since 1000 is a small number of trials to converge toward the expected value, I put an epsilon for tolerance in the
-   * output of the test.*/
+   * output of the test. Increasing the number of trials the epsilon can be reduced.
+   * */
   "NextMove" should "return Rock, Paper or Scissor with approximately the same probability" in {
     implicit val doubleEquality: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(0.03)
-    var counter: Seq[(Move, Double)] = Nil
-    (1 to 1000).foreach { _ => counter ++= Seq((MainApp.nextMove, 1.0)) }
+    val trials = 1000
 
-    val counterAgg: Map[Move, Double] = counter.groupBy(_._1).mapValues(_.map(_._2).sum / 1000)
+    var counter: Seq[(Move, Double)] = Nil
+    (1 to trials).foreach { _ => counter ++= Seq((MainApp.nextMove, 1.0)) }
+
+    val counterAgg: Map[Move, Double] = counter.groupBy(_._1).mapValues(_.map(_._2).sum / trials)
 
     counterAgg.map { case (_, v) => assert(v === 0.33) }
   }
 
   /**
-   * First all valid input are defined, then a stdin mock is created so that the test can ingest an input as if
+   * First all valid inputs(fixtures) are defined, then a stdin mock is created so that the test can ingest an input as if
    * someone is doing it from the keyboard.A bit verbose, but at least the coverage is almost total, invalid input branch
    * is not tested since it would require to feed console.withIn() with at least 2 lines, I don't know how to do that
    * and for the purpose of this demo I guess that the coverage is fine as it is.
@@ -40,31 +43,31 @@ class MainAppSpec extends FlatSpec {
     val inScissor = new ByteArrayInputStream("Scissor".getBytes)
 
     Console.withIn(inr) {
-      assert(MainApp.insertMove == Rock)
+      assert(MainApp.insertMove("Pietro") == Rock)
     }
     Console.withIn(inrock) {
-      assert(MainApp.insertMove == Rock)
+      assert(MainApp.insertMove("Pietro") == Rock)
     }
     Console.withIn(inRock) {
-      assert(MainApp.insertMove == Rock)
+      assert(MainApp.insertMove("Pietro") == Rock)
     }
     Console.withIn(inp) {
-      assert(MainApp.insertMove == Paper)
+      assert(MainApp.insertMove("Pietro") == Paper)
     }
     Console.withIn(inpaper) {
-      assert(MainApp.insertMove == Paper)
+      assert(MainApp.insertMove("Pietro") == Paper)
     }
     Console.withIn(inPaper) {
-      assert(MainApp.insertMove == Paper)
+      assert(MainApp.insertMove("Pietro") == Paper)
     }
     Console.withIn(ins) {
-      assert(MainApp.insertMove == Scissor)
+      assert(MainApp.insertMove("Pietro") == Scissor)
     }
     Console.withIn(inscissor) {
-      assert(MainApp.insertMove == Scissor)
+      assert(MainApp.insertMove("Pietro") == Scissor)
     }
     Console.withIn(inScissor) {
-      assert(MainApp.insertMove == Scissor)
+      assert(MainApp.insertMove("Pietro") == Scissor)
     }
   }
 
@@ -73,6 +76,7 @@ class MainAppSpec extends FlatSpec {
    * are only 3^2 combinations :)
    **/
   "resolver" should "enforce RockPaperScissor game rules" in {
+    implicit val ctx: AppContext = new AppContext()
     assert(MainApp.resolver(Rock, Rock) == Draw)
     assert(MainApp.resolver(Rock, Paper) == Lose)
     assert(MainApp.resolver(Rock, Scissor) == Win)

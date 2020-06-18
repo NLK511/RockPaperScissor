@@ -12,6 +12,6 @@ resolvers := Seq("sgodbillon" at "https://bitbucket.org/sgodbillon/repository/ra
   "Maven repo1" at "https://repo1.maven.org/")
 
 
-libraryDependencies += "com.typesafe" % "config" % Versions.typeSafeConfig
+//libraryDependencies += "com.typesafe" % "config" % Versions.typeSafeConfig
 libraryDependencies += "org.scalatest" %% "scalatest" % Versions.scalatest % "test"
 libraryDependencies += "org.scala-lang" % "scala-library" % Versions.scala
